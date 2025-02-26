@@ -2,7 +2,7 @@
 from dash import Dash, html, dash_table, dcc, callback, Output, Input
 import pandas as pd
 import plotly.express as px
-from utils.fhir_utils import fetch_patient_data, handle_deceased_datetime_add_helper_columns
+from utils.fhir_utils import fetch_patient_data
 from pathlib import Path
 # import dash_bootstrap_components as dbc
 
@@ -16,6 +16,19 @@ project_root = Path(__file__).resolve().parent.parent
 data_folder = project_root / 'data'
 
 data_file_path = data_folder / 'conneticut_wide_form.csv'
+
+def handle_deceased_datetime_add_helper_columns(df):
+    """
+    assumes df['deceasedDateTime'] exists
+    """
+    df = df.dropna(subset=['deceasedDateTime']) # doesn't make sense to have death data with no time of death
+
+    df['deceasedDateTime'] = pd.to_datetime(df['deceasedDateTime'], errors='coerce')
+    df['deceasedYear'] = (df['deceasedDateTime'].dt.year).astype(int)
+    df['deceasedMonth'] = (df['deceasedDateTime'].dt.month).astype(int)
+    df['deceasedDay'] = (df['deceasedDateTime'].dt.day).astype(int)
+
+    return df
 
 # Incorporate data
 if USE_FHIR:
