@@ -31,6 +31,7 @@ else:
     df = handle_deceased_datetime_add_helper_columns(df)
 
 app = Dash(__name__)
+server = app.server
 
 app.layout = html.Div(children=[
     dcc.Graph(id='graph-with-slider'),
